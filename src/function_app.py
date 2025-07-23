@@ -14,11 +14,22 @@ from activities.chuncking import chunking
 from activities.embedding import embedding
 from activities.search import ensure_index_exists, add_documents
 
+from orchestrators.atg_ebook_processor import atg_dispatch_process
+from activities.atg.extract_ebook import extract_ebook
+from activities.atg.generate_image_purpose import generate_image_purpose
+from activities.atg.describe_image import describe_image
+from activities.atg.refine_description import refine_description
+from activities.atg.save_ebook import save_ebook
+from activities.atg.save_image import save_image
+
 
 defaults = {
     "BLOB_AMOUNT_PARALLEL": int(os.environ.get("BLOB_AMOUNT_PARALLEL", "20")),
     "SEARCH_INDEX_NAME": os.environ.get("SEARCH_INDEX_NAME", "default-index"),
-    "BLOB_CONTAINER_NAME": os.environ.get("BLOB_CONTAINER_NAME", "source")
+    "BLOB_CONTAINER_NAME": os.environ.get("BLOB_CONTAINER_NAME", "source"),
+    "EPUB_BLOB_CONTAINER_NAME": os.environ.get("EPUB_BLOB_CONTAINER_NAME", "epub"),
+    "EBOOK_TABLE_CONTAINER_NAME": os.environ.get("EBOOK_TABLE_CONTAINER_NAME", "books"),
+    "IMAGE_TABLE_CONTAINER_NAME": os.environ.get("IMAGE_TABLE_CONTAINER_NAME", "images")
 }
 
 
@@ -80,6 +91,19 @@ async def index_http(req: func.HttpRequest, client: DurableOrchestrationClient) 
     instance_id = await client.start_new(
         orchestration_function_name="index",
         client_input={"prefix_list": input['prefix_list'], "index_name": input['index_name'], "defaults": defaults})
+    return func.HttpResponse(instance_id, status_code=200)
+
+@app.function_name(name='atg_process_http')
+@app.route(route="atg_process", methods=[func.HttpMethod.POST])
+@app.durable_client_input(client_name="client")
+async def atg_process_http(req: func.HttpRequest, client: DurableOrchestrationClient) -> func.HttpResponse:
+    logging.info('Kick off alt-text-generation process.')
+    input = req.get_json()
+    instance_id = await client.start_new(
+        orchestration_function_name="atg_dispatch_process",
+        client_input={"prefix_list": input['prefix_list'], "defaults": defaults})
+    
+    print(f'Started alt-text generation with id: {instance_id}')
     return func.HttpResponse(instance_id, status_code=200)
 
 @app.function_name(name='orchestration_health')

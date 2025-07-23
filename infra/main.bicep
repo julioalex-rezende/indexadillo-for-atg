@@ -33,7 +33,8 @@ var storages = [
   {
     name: 'sourceStorage'
     storageAccountName: '${abbrs.storageStorageAccounts}source${resourceToken}'
-    containerNames: [functionContainerName, 'source']
+    containerNames: [functionContainerName, 'source', 'epub', 'thumbnails']
+    tableNames: ['books', 'images']
   }
 ]
 
@@ -46,6 +47,7 @@ module storage 'core/storage/storage-account.bicep' = [
       tags: tags
       storageAccountName: storage.storageAccountName
       containerNames: storage.containerNames
+      tableNames: storage.tableNames
     }
   }
 ]

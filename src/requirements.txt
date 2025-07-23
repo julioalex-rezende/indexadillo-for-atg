@@ -17,6 +17,7 @@ azure-functions-durable==1.2.10
 azure-identity==1.19.0
 azure-search-documents==11.6.0b6
 azure-storage-blob==12.24.0
+azure-data-tables==12.4.0
 certifi==2024.12.14
 cffi==1.17.1
 charset-normalizer==3.4.0
@@ -60,3 +61,4 @@ tqdm==4.67.1
 typing_extensions==4.12.2
 urllib3==2.5.0
 yarl==1.18.3
+beautifulsoup4==4.12.3
