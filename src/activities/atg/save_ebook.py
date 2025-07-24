@@ -32,19 +32,6 @@ def save_ebook(input: dict) -> str:
     table_service = TableServiceClient(endpoint=account_url, credential=credential)
     table_client = table_service.get_table_client(table_name)
 
-    # # Extract required fields
-    # isbn = ebook_object.get("id")
-    # author = ebook_object.get("author")
-    # title = ebook_object.get("title")
-
-    # entity = {
-    #     "PartitionKey": "ebook",
-    #     "RowKey": isbn,
-    #     "author": author,
-    #     "title": title,
-    #     "status": status
-    # }
-
     entity = ebook_object.model_dump(by_alias=True)
     entity["status"] = status 
     entity.pop('images', None)  # Safely remove 'images' from the ebook object

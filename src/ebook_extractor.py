@@ -31,7 +31,7 @@ def extract_ebook_from_url(ebookurl: str) -> EbookObject:
     logging.info(f"Starting extraction for ebook: {ebookurl}")
 
     # Download the epub file from Azure Blob Storage using Azure SDK
-    blob_client = BlobClient.from_blob_url(ebookurl) #, credential=DefaultAzureCredential())
+    blob_client = BlobClient.from_blob_url(ebookurl, credential=DefaultAzureCredential())
     downloader = blob_client.download_blob()
     epub_bytes = downloader.readall()
 

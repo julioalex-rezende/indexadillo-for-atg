@@ -50,16 +50,17 @@ def list_blobs_chunk(params: dict):
     pages = result_segment.by_page(continuation_token=continuation_token)
     for page in pages:
         for blob in page:
-            sas_token = generate_blob_sas(
-                account_name=source_account_name,
-                container_name=container_name,
-                blob_name=blob.name,
-                user_delegation_key=user_delegation_key,
-                permission=BlobSasPermissions(read=True),
-                expiry=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
-            )
+            # sas_token = generate_blob_sas(
+            #     account_name=source_account_name,
+            #     container_name=container_name,
+            #     blob_name=blob.name,
+            #     user_delegation_key=user_delegation_key,
+            #     permission=BlobSasPermissions(read=True),
+            #     expiry=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
+            # )
             blob_urls.append(
-                f"https://{source_account_name}.blob.core.windows.net/{container_name}/{quote(blob.name)}?{sas_token}"
+                f"https://{source_account_name}.blob.core.windows.net/{container_name}/{quote(blob.name)}"
+                # f"https://{source_account_name}.blob.core.windows.net/{container_name}/{quote(blob.name)}?{sas_token}"
             )
         new_continuation_token = pages.continuation_token
         if not new_continuation_token:
