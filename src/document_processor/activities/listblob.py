@@ -1,18 +1,15 @@
-# list_blobs_chunk_activity.py
-
 import azure.functions as func
 import azure.durable_functions as df
 from azure.storage.blob import BlobServiceClient
 import os
 from application.app import app
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from urllib.parse import quote
 import datetime
 
-@app.function_name(name="list_blobs_chunk")
+@app.function_name(name="list_blobs")
 @app.activity_trigger(input_name="params")
-def list_blobs_chunk(params: dict):
+def list_blobs(params: dict):
     container_name = params.get("container_name")
     continuation_token = params.get("continuation_token")
     prefix_list_offset = params.get("prefix_list_offset", 0)
@@ -40,27 +37,13 @@ def list_blobs_chunk(params: dict):
         name_starts_with=prefix_list[prefix_list_offset],
         results_per_page=chunk_size
     )
-    
-    user_delegation_key = source_blob_service_client.get_user_delegation_key(
-        key_start_time=datetime.datetime.now(datetime.timezone.utc),
-        key_expiry_time=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
-    )
 
     new_continuation_token = None
     pages = result_segment.by_page(continuation_token=continuation_token)
     for page in pages:
         for blob in page:
-            # sas_token = generate_blob_sas(
-            #     account_name=source_account_name,
-            #     container_name=container_name,
-            #     blob_name=blob.name,
-            #     user_delegation_key=user_delegation_key,
-            #     permission=BlobSasPermissions(read=True),
-            #     expiry=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
-            # )
             blob_urls.append(
                 f"https://{source_account_name}.blob.core.windows.net/{container_name}/{quote(blob.name)}"
-                # f"https://{source_account_name}.blob.core.windows.net/{container_name}/{quote(blob.name)}?{sas_token}"
             )
         new_continuation_token = pages.continuation_token
         if not new_continuation_token:

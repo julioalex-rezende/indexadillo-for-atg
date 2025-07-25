@@ -28,7 +28,7 @@ def atg_dispatch_process(context: DurableOrchestrationContext):
         prefix_list = [""] if "prefix_list" not in input else input["prefix_list"] 
         
         # Call the activity to list blobs in chunks
-        blob_list_result = yield context.call_activity("list_blobs_chunk", {
+        blob_list_result = yield context.call_activity("list_blobs", {
                     "container_name": container_name,
                     "continuation_token": continuation_token,
                     "chunk_size": blob_amount_parallel,
@@ -47,19 +47,19 @@ def atg_dispatch_process(context: DurableOrchestrationContext):
         for blob_name in blob_list_result["blob_names"]:
             document_retry_options = RetryOptions(first_retry_interval_in_milliseconds=60_000, max_number_of_attempts=3)
             task_list.append(context.call_sub_orchestrator_with_retry(
-                name="process_document",
+                name="atg_process_document",
                 retry_options=document_retry_options,
                 input_={"blob_url": blob_name}))
 
         # wait for all tasks to complete
         yield context.task_all(task_list)
 
-@app.function_name(name="process_document") 
+@app.function_name(name="atg_process_document") 
 @app.orchestration_trigger(context_name="context")
-def process_document(context: DurableOrchestrationContext):
+def atg_process_document(context: DurableOrchestrationContext):
     input = context.get_input()
     
-    service_retry_options = RetryOptions(first_retry_interval_in_milliseconds=3000, max_number_of_attempts=1)
+    service_retry_options = RetryOptions(first_retry_interval_in_milliseconds=3000, max_number_of_attempts=3)
     
     ebook_url = input["blob_url"]
     

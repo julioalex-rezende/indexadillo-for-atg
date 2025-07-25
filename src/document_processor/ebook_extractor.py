@@ -217,16 +217,3 @@ def gather_file_image_data(zip_file, xhtml_filename) -> list[ExtractedImageData]
         image_data_dict_list.append(extracted_image)
 
     return image_data_dict_list
-
-if __name__ == "__main__":
-    # Example usage
-    ebook_url = "https://stsource4rd5cjvexii5m.blob.core.windows.net/epub/9780385546140_EPUB_GMP.epub?se=2025-07-22T16%3A59%3A49Z&sp=r&sv=2025-01-05&sr=b&skoid=c712c31c-2b5b-407c-9724-f3436913bf6e&sktid=16b3c013-d300-468d-ac64-7eda0820b6d3&skt=2025-07-22T15%3A59%3A48Z&ske=2025-07-22T16%3A59%3A48Z&sks=b&skv=2025-01-05&sig=DhFqEVbB6WQVrIAqcJJuO2nU5pRmCA1s0o/ggLWfq54%3D"
-    try:
-        ebook_object = extract_ebook_from_url(ebook_url)
-
-        print(ebook_object.model_dump_json(by_alias=True))  # Print the ebook object as JSON
-
-        print(f"Ebook Title: {ebook_object.title}, Author: {ebook_object.author}")
-        print(f"Number of Images: {len(ebook_object.images)}")
-    except Exception as e:
-        logging.error(f"Error extracting ebook: {e}")

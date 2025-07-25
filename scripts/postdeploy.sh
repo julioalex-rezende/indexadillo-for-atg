@@ -19,7 +19,7 @@ echo "Check Event Subscription status"
 list_evensub=$(az eventgrid system-topic event-subscription list \
     --resource-group $RESOURCE_GROUP_NAME \
     --system-topic-name $SYSTEM_TOPIC_NAME \
-    --odata-query "name eq 'StorageBlobCreated'")
+    --odata-query "name eq 'StorageBlobEpubUploaded'")
 
 if echo "$list_evensub" | jq -e 'length == 0' > /dev/null; then
     echo "Create Event Subscription"
@@ -33,10 +33,11 @@ if echo "$list_evensub" | jq -e 'length == 0' > /dev/null; then
     )
 
     az eventgrid system-topic event-subscription create \
-        --name StorageBlobCreated \
+        --name StorageBlobEpubUploaded \
         --resource-group $RESOURCE_GROUP_NAME \
         --system-topic-name $SYSTEM_TOPIC_NAME \
-        --endpoint "https://$FUNCTION_APP_NAME.azurewebsites.net/runtime/webhooks/EventGrid?functionName=index_event_grid&code=$code" \
-        --subject-begins-with "/blobServices/default/containers/source" \
+        --endpoint "https://$FUNCTION_APP_NAME.azurewebsites.net/runtime/webhooks/EventGrid?functionName=atg_process_event_grid&code=$code" \
+        --subject-begins-with "/blobServices/default/containers/epub" \
         --included-event-types "Microsoft.Storage.BlobCreated"
+
 fi

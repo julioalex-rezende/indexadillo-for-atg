@@ -1,11 +1,4 @@
-### Request to index_http Azure Function
-POST http://localhost:7071/api/index
-Content-Type: application/json
 
-{
-    "prefix_list": [""],
-    "index_name": "test-index-i8wk7gwhpl"
-}
 
 ### Request to atg_process Azure Function
 POST http://localhost:7071/api/atg_process
@@ -14,3 +7,8 @@ Content-Type: application/json
 {
     "prefix_list": [""]
 }
+
+# ### Status endpoint
+# GET http://localhost:7071/api/status
+# Content-Type: application/json
+
